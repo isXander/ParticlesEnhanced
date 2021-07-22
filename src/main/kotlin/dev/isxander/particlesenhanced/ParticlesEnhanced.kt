@@ -2,8 +2,11 @@ package dev.isxander.particlesenhanced
 
 import dev.isxander.particlesenhanced.command.ParticlesEnhancedCommand
 import dev.isxander.particlesenhanced.config.ParticlesEnhancedConfig
+import dev.isxander.particlesenhanced.modules.overrides.AlwaysCriticals
+import dev.isxander.particlesenhanced.modules.overrides.AlwaysSharpness
 import dev.isxander.xanderlib.utils.Constants.mc
 import gg.essential.vigilance.Vigilance
+import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.fml.common.Mod
 import net.minecraftforge.fml.common.event.FMLInitializationEvent
 import java.io.File
@@ -22,6 +25,8 @@ object ParticlesEnhanced {
 
     @Mod.EventHandler
     fun onFMLInit(event: FMLInitializationEvent) {
+        DATA_DIR.mkdirs()
+
         Vigilance.initialize()
         ParticlesEnhancedConfig.preload()
 
@@ -30,6 +35,10 @@ object ParticlesEnhanced {
         ParticlesEnhancedCommand("particle").register()
         ParticlesEnhancedCommand("particles").register()
         ParticlesEnhancedCommand("penhanced").register()
+        ParticlesEnhancedCommand("pem").register()
+
+        MinecraftForge.EVENT_BUS.register(AlwaysCriticals)
+        MinecraftForge.EVENT_BUS.register(AlwaysSharpness)
     }
 
 }

@@ -4,6 +4,7 @@
   "package": "dev.isxander.particlesenhanced.mixins",
   "refmap": "mixins.examplemod.refmap.json",
   "mixins": [
-    "MixinEntityFX"
+    "MixinEntityFX",
+    "MixinWorld"
   ]
 }
