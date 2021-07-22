@@ -26,6 +26,15 @@ object ParticlesEnhancedConfig : Vigilant(File(ParticlesEnhanced.DATA_DIR, "conf
     var fade = true
 
     @Property(
+        type = PropertyType.PERCENT_SLIDER,
+        name = "Fade Out Start",
+        description = "How far into the lifespan of the particle before it starts to fade.",
+        category = "Aesthetics",
+        subcategory = "Fade"
+    )
+    var fadeOutStart = 0.5f
+
+    @Property(
         type = PropertyType.SLIDER,
         name = "Minimum Transparency",
         description = "Rather than fading to nothing fade to this value.",

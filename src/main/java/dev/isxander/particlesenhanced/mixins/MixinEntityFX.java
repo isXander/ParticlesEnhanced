@@ -32,8 +32,11 @@ public abstract class MixinEntityFX {
 
         if (!cfg.getFade()) return;
 
-        float alpha = 1 - MathUtils.getPercent(particleAge, particleMaxAge * (cfg.getMinFadeTransparency() / 100f), particleMaxAge);
-        if (getAlpha() != alpha) setAlphaF(alpha);
+        float lifeSpan = MathUtils.getPercent(particleAge, particleMaxAge * (cfg.getMinFadeTransparency() / 100f), particleMaxAge);
+        if (lifeSpan > ParticlesEnhancedConfig.INSTANCE.getFadeOutStart()) {
+            float alpha = 1 - lifeSpan + ParticlesEnhancedConfig.INSTANCE.getFadeOutStart();
+            if (getAlpha() != alpha) setAlphaF(alpha);
+        }
     }
 
 }
