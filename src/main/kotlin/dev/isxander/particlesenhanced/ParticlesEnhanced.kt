@@ -10,6 +10,7 @@ import dev.isxander.particlesenhanced.command.ParticlesEnhancedCommand
 import dev.isxander.particlesenhanced.config.ParticlesEnhancedConfig
 import dev.isxander.particlesenhanced.modules.overrides.AlwaysCriticals
 import dev.isxander.particlesenhanced.modules.overrides.AlwaysSharpness
+import dev.isxander.xanderlib.XanderLib
 import dev.isxander.xanderlib.utils.Constants.mc
 import gg.essential.vigilance.Vigilance
 import net.minecraftforge.common.MinecraftForge
@@ -31,6 +32,8 @@ object ParticlesEnhanced {
 
     @Mod.EventHandler
     fun onFMLInit(event: FMLInitializationEvent) {
+        XanderLib.getInstance().initPhase()
+
         DATA_DIR.mkdirs()
 
         Vigilance.initialize()
