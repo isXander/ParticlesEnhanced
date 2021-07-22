@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) [2021 - 2021] isXander
+ *
+ * All rights reserved!
+ */
+
 package dev.isxander.particlesenhanced
 
 import dev.isxander.particlesenhanced.command.ParticlesEnhancedCommand
