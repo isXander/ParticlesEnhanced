@@ -4,12 +4,12 @@ plugins {
     id 'org.jetbrains.kotlin.jvm' version '1.5.21'
 
     // Minecraft Tools
-    id 'net.minecraftforge.gradle.forge' version '8708bf3e0'
-    id 'org.spongepowered.mixin' version '0.6-SNAPSHOT'
+    id 'fabric-loom' version '0.8-SNAPSHOT'
 
     // Build Tools
-    id 'com.github.johnrengelman.shadow' version '6.1.0'
+    id 'com.github.johnrengelman.shadow' version '7.0.0'
     id 'com.github.gmazzo.buildconfig' version '3.0.1'
+    id 'maven-publish'
 }
 
 group 'dev.isxander'
@@ -24,14 +24,7 @@ version = {
     return normal
 }()
 
-targetCompatibility = sourceCompatibility = JavaVersion.VERSION_1_8
-
-minecraft {
-    version = '1.8.9-11.15.1.2318-1.8.9'
-    mappings = 'stable_22'
-    runDir = 'run'
-    makeObfSourceJar = false
-}
+targetCompatibility = sourceCompatibility = JavaVersion.VERSION_16
 
 buildConfig {
     className "${mod_name}Info"
@@ -52,42 +45,28 @@ buildConfig {
 
 repositories {
     mavenCentral()
-    maven { url 'https://repo.spongepowered.org/maven' }
     maven { url 'https://jitpack.io' }
     maven { url 'https://repo.sk1er.club/repository/maven-public' }
 }
 
 configurations {
-    include
-    implementation.extendsFrom include
+    embedMod
+    modImplementation.extendsFrom embedMod
 }
 
 dependencies {
-    // Essential
-    include 'gg.essential:loader-launchwrapper:1.0.2'
-    provided 'gg.essential:essential-1.8.9-forge:1234'
+    embedMod 'gg.essential:Vigilance:next-148-11700-fabric-SNAPSHOT'
 
-    include 'dev.isXander.kotlin-forge-api:forge-event-dsl:481f620'
-    include ('dev.isXander:XanderLib:1.1.4') {
-        exclude module: 'Essential'
-        exclude module: 'kotlin-stdlib-jdk8'
-    }
-
-    annotationProcessor 'org.spongepowered:mixin:0.7.11-SNAPSHOT'
-    implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8'
+    minecraft "com.mojang:minecraft:$minecraft_version"
+    mappings "net.fabricmc:yarn:$yarn_mappings"
+    modImplementation "net.fabricmc:fabric-loader:$loader_version"
+    modImplementation "net.fabricmc.fabric-api:fabric-api:$fabric_version"
+    modImplementation "net.fabricmc:fabric-language-kotlin:$kotlin_version"
 }
 
-jar {
-    manifest.attributes (
-            'MixinConfigs': 'mixins.particlesenhanced.json',
-            'TweakClass': 'gg.essential.loader.stage0.EssentialSetupTweaker'
-    )
-
-    enabled = false
-}
-
-tasks.withType(JavaCompile) {
-    options.encoding = 'UTF-8'
+tasks.withType(JavaCompile).configureEach {
+    it.options.encoding = 'UTF-8'
+    it.options.release = 16
 }
 
 compileKotlin {
@@ -103,7 +82,7 @@ processResources {
     inputs.property 'mod_name', mod_name
     inputs.property 'mod_description', mod_description
 
-    filesMatching('mcmod.info') {
+    filesMatching('fabric.mod.json') {
         expand (
                 'mod_version': project.version,
                 'mod_id': mod_id,
@@ -115,18 +94,6 @@ processResources {
     rename '(.+_at.cfg)', 'META-INF/$1'
 }
 
-task moveResources {
-    doLast {
-        ant.move (
-                file: "${buildDir}/resources/main",
-                todir: "${buildDir}/classes/java"
-        )
-    }
-}
-
-tasks.moveResources.dependsOn processResources
-tasks.classes.dependsOn moveResources
-
 shadowJar {
     archiveClassifier.set('')
 
@@ -134,25 +101,4 @@ shadowJar {
     duplicatesStrategy DuplicatesStrategy.EXCLUDE
 
     exclude "META-INF/versions/**"
-}
-
-mixin {
-    disableRefMapWarning true
-    defaultObfuscationEnv searge
-    add sourceSets.main, 'mixins.particlesenhanced.refmap.json'
-}
-
-reobf {
-    shadowJar {
-        classpath = sourceSets.main.compileClasspath
-        mappingType = 'SEARGE'
-    }
-}
-
-reobfJar.dependsOn tasks.shadowJar
-
-sourceSets {
-    main {
-        ext.refMap = 'mixins.particlesenhanced.refmap.json'
-    }
 }

@@ -1,10 +1,12 @@
 {
-  "compatibilityLevel": "JAVA_8",
+  "compatibilityLevel": "JAVA_16",
   "minVersion": "0.7",
   "package": "dev.isxander.particlesenhanced.mixins",
   "refmap": "mixins.particlesenhanced.refmap.json",
   "mixins": [
-    "MixinEntityFX",
-    "MixinWorld"
+    "MixinClientPlayerEntity",
+    "MixinParticle",
+    "MixinPlayerEntity",
+    "MixinWorldRenderer"
   ]
 }

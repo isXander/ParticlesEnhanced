@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "id": "${mod_id}",
+  "version": "${mod_version}",
+  "name": "${mod_name}",
+  "description": "${mod_description}",
+  "authors": [
+    "isXander"
+  ],
+  "contact": {
+    "homepage": "https://www.isxander.dev/",
+    "issues": "https://github.com/isXander/ParticlesEnhanced/issues",
+    "sources": "https://github.com/isXander/ParticlesEnhanced"
+  },
+  "license": "GNU Lesser General Public License version 3 (LGPLv3)",
+  "environment": "*",
+  "entrypoints": {
+    "client": [
+      {
+        "adapter": "kotlin",
+        "value": "dev.isxander.particlesenhanced.ParticlesEnhanced"
+      }
+    ]
+  },
+  "mixins": [
+    "mixins.particlesenhanced.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.11.6",
+    "fabric": "*",
+    "fabric-language-kotlin": ">=1.6.3+kotlin.1.5.21",
+    "minecraft": "1.17.x",
+    "java": ">=16"
+  }
+}

@@ -7,35 +7,43 @@
 package dev.isxander.particlesenhanced.modules.overrides
 
 import dev.isxander.particlesenhanced.config.ParticlesEnhancedConfig
-import dev.isxander.xanderlib.utils.Constants.mc
-import net.minecraft.entity.EntityLivingBase
-import net.minecraft.potion.Potion
-import net.minecraft.util.DamageSource
-import net.minecraft.util.EnumParticleTypes
-import net.minecraftforge.event.entity.player.AttackEntityEvent
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import dev.isxander.particlesenhanced.event.AttemptAttackEntityCallback
+import dev.isxander.particlesenhanced.mc
+import net.minecraft.client.network.ClientPlayerEntity
+import net.minecraft.entity.Entity
+import net.minecraft.entity.LivingEntity
+import net.minecraft.entity.damage.DamageSource
+import net.minecraft.entity.effect.StatusEffects
+import net.minecraft.particle.ParticleTypes
+import net.minecraft.util.ActionResult
 
 object AlwaysCriticals {
 
-    @SubscribeEvent
-    fun onAttack(event: AttackEntityEvent) {
-        if (!ParticlesEnhancedConfig.alwaysCrit)
-            return
+    init {
+        AttemptAttackEntityCallback.EVENT.register(object : AttemptAttackEntityCallback {
+            override fun interact(attacker: ClientPlayerEntity, target: Entity): ActionResult {
+                if (!ParticlesEnhancedConfig.alwaysCrit)
+                    return ActionResult.PASS
 
-        if (ParticlesEnhancedConfig.checkInvulnerable && event.target.isEntityInvulnerable(DamageSource.causePlayerDamage(event.entityPlayer)))
-            return
+                if (ParticlesEnhancedConfig.checkInvulnerable && target.isInvulnerableTo(DamageSource.player(attacker)))
+                    return ActionResult.PASS
 
-        val criticalHit = event.entityPlayer.fallDistance > 0.0F
-                && !event.entityPlayer.onGround
-                && !event.entityPlayer.isOnLadder
-                && !event.entityPlayer.isInWater
-                && !event.entityPlayer.isPotionActive(Potion.blindness)
-                && event.entityPlayer.ridingEntity == null
-                && event.target is EntityLivingBase
+                val criticalHit = attacker.getAttackCooldownProgress(0.5f) > 0.9f
+                        && attacker.fallDistance > 0.0F
+                        && !attacker.isOnGround
+                        && !attacker.isClimbing
+                        && !attacker.isTouchingWater
+                        && !attacker.hasStatusEffect(StatusEffects.BLINDNESS)
+                        && !attacker.hasVehicle()
+                        && target is LivingEntity
 
-        if (!criticalHit) {
-            mc.effectRenderer.emitParticleAtEntity(event.target, EnumParticleTypes.CRIT)
-        }
+                if (!criticalHit) {
+                    mc.particleManager.addEmitter(target, ParticleTypes.CRIT);
+                }
+
+                return ActionResult.PASS
+            }
+        })
     }
 
 }
