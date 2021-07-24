@@ -15,8 +15,6 @@ import java.io.File
 
 object ParticlesEnhancedConfig : Vigilant(File(ParticlesEnhanced.DATA_DIR, "config.toml"), "Particles Enhanced") {
 
-    init { initialize() }
-
     @Property(
         type = PropertyType.SELECTOR,
         name = "Critical Particle Type",
@@ -123,4 +121,6 @@ object ParticlesEnhancedConfig : Vigilant(File(ParticlesEnhanced.DATA_DIR, "conf
         category = "Connectivity"
     )
     var checkUpdates = true
+
+    init { initialize() }
 }

@@ -45,7 +45,6 @@ object ParticlesEnhanced {
 
         DATA_DIR.mkdirs()
 
-        Vigilance.initialize()
         ParticlesEnhancedConfig.preload()
 
         if (ParticlesEnhancedConfig.checkUpdates && !EssentialAPI.getMinecraftUtil().isDevelopment()) {
