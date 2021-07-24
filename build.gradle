@@ -67,7 +67,9 @@ dependencies {
     include 'gg.essential:loader-launchwrapper:1.0.2'
     provided 'gg.essential:essential-1.8.9-forge:1234'
 
-    include 'dev.isXander.kotlin-forge-api:forge-event-dsl:481f620'
+    include ('dev.isXander.kotlin-forge-api:forge-event-dsl:481f620') {
+        exclude module: 'kotlin-stdlib-jdk8'
+    }
     include ('dev.isXander:XanderLib:1.1.4') {
         exclude module: 'Essential'
         exclude module: 'kotlin-stdlib-jdk8'

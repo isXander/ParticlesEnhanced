@@ -59,7 +59,6 @@ object ParticlesEnhanced {
                 buttonList.removeIf { it.id == 107 }
                 buttonList.add(GuiButton(838573356, screen.width / 2 + 5, screen.height / 6 + 72 - 6, 150, 20, "Particles Enhanced..."))
             }
-
             override fun onActionPerformedPost(
                 screen: GuiScreen,
                 buttonList: MutableList<GuiButton>,
