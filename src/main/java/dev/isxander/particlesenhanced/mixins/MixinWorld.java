@@ -7,7 +7,6 @@
 package dev.isxander.particlesenhanced.mixins;
 
 import dev.isxander.particlesenhanced.config.ParticlesEnhancedConfig;
-import net.minecraft.init.Blocks;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.world.IWorldAccess;
 import net.minecraft.world.World;
@@ -28,7 +27,6 @@ public class MixinWorld {
     @Inject(method = "spawnParticle(IZDDDDDD[I)V", at = @At("HEAD"), cancellable = true)
     private void spawnParticle(int particleID, boolean p_175720_2_, double xCoord, double yCoord, double zCoord, double xOffset, double yOffset, double zOffset, int[] p_175720_15_, CallbackInfo ci) {
         ParticlesEnhancedConfig cfg = ParticlesEnhancedConfig.INSTANCE;
-
         boolean override = true;
 
         switch (EnumParticleTypes.getParticleFromId(particleID)) {

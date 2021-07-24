@@ -115,4 +115,12 @@ object ParticlesEnhancedConfig : Vigilant(File(ParticlesEnhanced.DATA_DIR, "conf
         min = 0
     )
     var sharpMultiplier = 1
+
+    @Property(
+        type = PropertyType.SWITCH,
+        name = "Check for Updates",
+        description = "Connect to the internet to check if you are using the latest version on ParticlesEnhanced.",
+        category = "Connectivity"
+    )
+    var checkUpdates = true
 }

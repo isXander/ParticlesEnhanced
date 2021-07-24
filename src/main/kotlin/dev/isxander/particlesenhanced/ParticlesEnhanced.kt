@@ -13,7 +13,10 @@ import dev.isxander.particlesenhanced.modules.overrides.AlwaysSharpness
 import dev.isxander.xanderlib.XanderLib
 import dev.isxander.xanderlib.ui.editor.AbstractGuiModifier
 import dev.isxander.xanderlib.utils.Constants.mc
+import dev.isxander.xanderlib.utils.HttpsUtils
+import dev.isxander.xanderlib.utils.json.BetterJsonObject
 import gg.essential.api.EssentialAPI
+import gg.essential.universal.UDesktop
 import gg.essential.vigilance.Vigilance
 import net.minecraft.client.gui.GuiButton
 import net.minecraft.client.gui.GuiOptions
@@ -22,6 +25,7 @@ import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.fml.common.Mod
 import net.minecraftforge.fml.common.event.FMLInitializationEvent
 import java.io.File
+import java.net.URI
 
 @Mod(
     modid = ParticlesEnhancedInfo.ID,
@@ -43,6 +47,16 @@ object ParticlesEnhanced {
 
         Vigilance.initialize()
         ParticlesEnhancedConfig.preload()
+
+        if (ParticlesEnhancedConfig.checkUpdates && !EssentialAPI.getMinecraftUtil().isDevelopment()) {
+            val latest = BetterJsonObject(HttpsUtils.getString("https://dl.isxander.dev/mods/particlesenhanced/assets/metadata.json")).getObj("latest")
+
+            if (ParticlesEnhancedInfo.VERSION_MAJOR < latest.optInt("major") || ParticlesEnhancedInfo.VERSION_MINOR < latest.optInt("minor") || ParticlesEnhancedInfo.VERSION_PATCH < latest.optInt("patch")) {
+                EssentialAPI.getNotifications().push("Particles Enhanced", "There is an update available. Click here to go to the download page.") {
+                    UDesktop.browse(URI.create("https://hypixel.net/threads/4416018/"))
+                }
+            }
+        }
 
         ParticlesEnhancedCommand("particlesenhanced").register()
         ParticlesEnhancedCommand("particlemod").register()
