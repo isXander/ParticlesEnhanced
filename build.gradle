@@ -70,9 +70,8 @@ dependencies {
     include ('dev.isXander.kotlin-forge-api:forge-event-dsl:481f620') {
         exclude module: 'kotlin-stdlib-jdk8'
     }
-    include ('dev.isXander:XanderLib:1.1.4') {
+    include ('dev.isXander:XanderLib:1.1.7') {
         exclude module: 'Essential'
-        exclude module: 'kotlin-stdlib-jdk8'
     }
 
     annotationProcessor 'org.spongepowered:mixin:0.7.11-SNAPSHOT'
