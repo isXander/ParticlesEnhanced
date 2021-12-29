@@ -1,6 +1,6 @@
 {
   "compatibilityLevel": "JAVA_8",
-  "minVersion": "0.7",
+  "minVersion": "0.8",
   "package": "dev.isxander.particlesenhanced.mixins",
   "refmap": "mixins.particlesenhanced.refmap.json",
   "mixins": [

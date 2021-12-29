@@ -1,28 +1,18 @@
 plugins {
     // Languages
     id 'java'
-    id 'org.jetbrains.kotlin.jvm' version '1.5.21'
+    id 'org.jetbrains.kotlin.jvm' version '1.6.10'
 
     // Minecraft Tools
     id 'net.minecraftforge.gradle.forge' version '8708bf3e0'
-    id 'org.spongepowered.mixin' version '0.6-SNAPSHOT'
 
     // Build Tools
     id 'com.github.johnrengelman.shadow' version '6.1.0'
-    id 'com.github.gmazzo.buildconfig' version '3.0.1'
+    id 'net.kyori.blossom' version '1.3.0'
 }
 
 group 'dev.isxander'
-
-def modPackage = "$group.$mod_id"
-def isPrerelease =! mod_version_prerelease.trim().isEmpty()
-
-version = {
-    def normal = "$mod_version_major.$mod_version_minor.$mod_version_patch"
-    if (isPrerelease) normal += "-pre.$mod_version_prerelease"
-
-    return normal
-}()
+version '1.1.4'
 
 targetCompatibility = sourceCompatibility = JavaVersion.VERSION_1_8
 
@@ -33,21 +23,14 @@ minecraft {
     makeObfSourceJar = false
 }
 
-buildConfig {
-    className "${mod_name}Info"
-    packageName modPackage
-    useKotlinOutput()
+blossom {
+    def evergreenClass = "src/main/kotlin/dev/isxander/particlesenhanced/ParticlesEnhancedInfo.kt"
 
-    buildConfigField 'String', 'NAME', "\"$mod_name\""
-    buildConfigField 'String', 'ID', "\"$mod_id\""
-    buildConfigField 'String', 'DESCRIPTION', "\"$mod_description\""
+    replaceToken("__GRADLE_MOD_NAME__", modName, evergreenClass)
+    replaceToken("__GRADLE_MOD_ID__", modId, evergreenClass)
+    replaceToken("__GRADLE_MOD_DESCRIPTION__", modDescription, evergreenClass)
 
-    buildConfigField 'Int', 'VERSION_MAJOR', mod_version_major
-    buildConfigField 'Int', 'VERSION_MINOR', mod_version_minor
-    buildConfigField 'Int', 'VERSION_PATCH', mod_version_patch
-    buildConfigField 'Int?', 'VERSION_PRERELEASE', (isPrerelease ? "$mod_version_prerelease" : 'null')
-
-    buildConfigField 'String', 'VERSION_FULL', "\"${project.version}\""
+    replaceToken("__GRADLE_MOD_VERSION__", project.version, evergreenClass)
 }
 
 repositories {
@@ -64,8 +47,8 @@ configurations {
 
 dependencies {
     // Essential
-    include 'gg.essential:loader-launchwrapper:1.0.2'
-    provided 'gg.essential:essential-1.8.9-forge:1234'
+    include 'gg.essential:loader-launchwrapper:1.1.3'
+    compileOnly 'gg.essential:essential-1.8.9-forge:1725'
 
     include ('dev.isXander.kotlin-forge-api:forge-event-dsl:481f620') {
         exclude module: 'kotlin-stdlib-jdk8'
@@ -73,9 +56,24 @@ dependencies {
     include ('dev.isXander:XanderLib:1.1.7') {
         exclude module: 'Essential'
     }
+    include 'org.bundleproject:libversion:0.0.2'
 
-    annotationProcessor 'org.spongepowered:mixin:0.7.11-SNAPSHOT'
+    compileOnly 'org.spongepowered:mixin:0.8.5-SNAPSHOT'
+    annotationProcessor 'org.spongepowered:mixin:0.8.5-SNAPSHOT'
+
+    // more essential bullshit
+    annotationProcessor 'com.google.code.gson:gson:2.2.4'
+    annotationProcessor 'com.google.guava:guava:21.0'
+    annotationProcessor 'org.ow2.asm:asm-tree:6.2'
+    annotationProcessor 'org.apache.logging.log4j:log4j-core:2.0-beta9'
+
     implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8'
+}
+
+// more essential bullshit
+ext {
+    mixinSrg = new File(project.buildDir, 'tmp/mixins/mixins.srg')
+    mixinRefMap = new File(project.buildDir, 'tmp/mixins/mixins.particlesenhanced.refmap.json')
 }
 
 jar {
@@ -100,33 +98,21 @@ compileKotlin {
 
 processResources {
     inputs.property 'mod_version', project.version
-    inputs.property 'mod_id', mod_id
-    inputs.property 'mod_name', mod_name
-    inputs.property 'mod_description', mod_description
+    inputs.property 'mod_id', modId
+    inputs.property 'mod_name', modName
+    inputs.property 'mod_description', modDescription
 
     filesMatching('mcmod.info') {
         expand (
                 'mod_version': project.version,
-                'mod_id': mod_id,
-                'mod_name': mod_name,
-                'mod_description': mod_description
+                'mod_id': modId,
+                'mod_name': modName,
+                'mod_description': modDescription
         )
     }
 
     rename '(.+_at.cfg)', 'META-INF/$1'
 }
-
-task moveResources {
-    doLast {
-        ant.move (
-                file: "${buildDir}/resources/main",
-                todir: "${buildDir}/classes/kotlin"
-        )
-    }
-}
-
-tasks.moveResources.dependsOn processResources
-tasks.classes.dependsOn moveResources
 
 shadowJar {
     archiveClassifier.set('')
@@ -135,12 +121,9 @@ shadowJar {
     duplicatesStrategy DuplicatesStrategy.EXCLUDE
 
     exclude "META-INF/versions/**"
-}
 
-mixin {
-    disableRefMapWarning true
-    defaultObfuscationEnv searge
-    add sourceSets.main, 'mixins.particlesenhanced.refmap.json'
+    // essential bullshit
+    from files(project.mixinRefMap.canonicalPath)
 }
 
 reobf {
@@ -152,8 +135,19 @@ reobf {
 
 reobfJar.dependsOn tasks.shadowJar
 
-sourceSets {
-    main {
-        ext.refMap = 'mixins.particlesenhanced.refmap.json'
-    }
+// essential bullshit to fix mixins
+compileJava {
+    options.compilerArgs += [
+            "-AoutSrgFile=${project.mixinSrg.canonicalPath}",
+            "-AoutRefMapFile=${project.mixinRefMap.canonicalPath}",
+            "-AreobfSrgFile=${project.file('build/mcp-srg.srg').canonicalPath}"
+    ]
 }
+
+task copySrg(type: Copy, dependsOn: 'genSrgs') {
+    from { project.tasks.genSrgs.mcpToSrg }
+    into 'build'
+}
+compileJava.dependsOn copySrg
+
+reobfJar.addSecondarySrgFile project.mixinSrg

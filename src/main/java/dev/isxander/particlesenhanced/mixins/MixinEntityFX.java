@@ -19,7 +19,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(EntityFX.class)
 public abstract class MixinEntityFX {
-
     @Shadow public abstract void setAlphaF(float alpha);
     @Shadow public abstract float getAlpha();
 
