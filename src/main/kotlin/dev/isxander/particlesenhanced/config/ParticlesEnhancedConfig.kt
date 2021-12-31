@@ -14,7 +14,6 @@ import net.minecraft.util.EnumParticleTypes
 import java.io.File
 
 object ParticlesEnhancedConfig : Vigilant(File(ParticlesEnhanced.DATA_DIR, "config.toml"), "Particles Enhanced") {
-
     @Property(
         type = PropertyType.SELECTOR,
         name = "Critical Particle Type",
@@ -61,6 +60,15 @@ object ParticlesEnhancedConfig : Vigilant(File(ParticlesEnhanced.DATA_DIR, "conf
         subcategory = "Overrides"
     )
     var alwaysSharp = false
+
+    @Property(
+        type = PropertyType.SWITCH,
+        name = "Override Critical Bow Arrows",
+        description = "When you fire a full charge hit with a bow, critical particles are spawned. Override with your desired particle?",
+        category = "Aesthetics",
+        subcategory = "Overrides"
+    )
+    var overrideCriticalBow = true
 
 
     @Property(
